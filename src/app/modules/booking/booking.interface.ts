@@ -11,7 +11,7 @@ export type IBooking = {
   };
   locations: {
     pickup: string;
-    dropoff: string;
+    destination: string;
   };
   totalPassengers: number;
   flightDetails?: {

@@ -14,7 +14,7 @@ const createBookingZodSchema = z.object({
     }),
     locations: z.object({
       pickup: z.string({ required_error: 'Pickup location is required' }),
-      dropoff: z.string({ required_error: 'Dropoff location is required' }),
+      destination: z.string({ required_error: 'Destination location is required' }),
     }),
     totalPassengers: z.number({ required_error: 'Total passengers is required' }),
     flightDetails: z
@@ -49,7 +49,7 @@ const updateBookingZodSchema = z.object({
     locations: z
       .object({
         pickup: z.string().optional(),
-        dropoff: z.string().optional(),
+        destination: z.string().optional(),
       })
       .optional(),
     totalPassengers: z.number().optional(),

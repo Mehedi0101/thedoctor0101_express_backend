@@ -30,7 +30,7 @@ const bookingSchema = new Schema<IBooking>(
     },
     locations: {
       pickup: { type: String, required: true },
-      dropoff: { type: String, required: true },
+      destination: { type: String, required: true },
     },
     totalPassengers: {
       type: Number,
