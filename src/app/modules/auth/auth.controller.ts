@@ -8,7 +8,7 @@ import catchAsync from "../../utils/catchAsync";
  */
 const registerUser = catchAsync(async (req, res) => {
   const result = await AuthServices.registerUser(req.body);
-  const { accessToken } = result;
+  const { accessToken, newUser } = result;
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -16,6 +16,11 @@ const registerUser = catchAsync(async (req, res) => {
     message: "User registered successfully!",
     data: {
       accessToken,
+      user: {
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+      },
     },
   });
 });

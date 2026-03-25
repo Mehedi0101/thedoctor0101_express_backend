@@ -8,8 +8,6 @@ const registerValidationSchema = z.object({
     password: z
       .string({ required_error: 'Password is required' })
       .min(6, 'Password must be at least 6 characters'),
-    image: z.string().optional(),
-    gender: z.enum(['male', 'female']).optional(),
   }),
 });
 

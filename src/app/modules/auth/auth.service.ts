@@ -13,7 +13,7 @@ const registerUser = async (payload: TRegisterUser) => {
   const user = await User.isUserExistsByEmail(payload?.email);
 
   if (user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'This user already exists!');
+    throw new AppError(httpStatus.CONFLICT, 'This user already exists!');
   }
 
   const userPayload = {
