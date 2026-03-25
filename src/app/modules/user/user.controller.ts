@@ -21,6 +21,24 @@ const getMe = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * @function changePassword
+ * @description Controller to change the current authenticated user's password.
+ */
+const changePassword = catchAsync(async (req, res) => {
+  const email = req.user?.email;
+
+  await UserServices.changePassword(email, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Password changed successfully',
+    data: null,
+  });
+});
+
 export const UserControllers = {
   getMe,
+  changePassword,
 };
