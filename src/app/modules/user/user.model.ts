@@ -1,8 +1,10 @@
+import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
-import { IUser, UserModel } from './user.interface';
+import config from '../../config';
+import { USER_ROLE, USER_STATUS } from './user.constant';
+import { IUserModel, TUser } from './user.interface';
 
-// --- Schema Definition ---
-const userSchema = new Schema<IUser, UserModel>(
+const userSchema = new Schema<TUser, IUserModel>(
   {
     name: {
       type: String,
@@ -20,9 +22,13 @@ const userSchema = new Schema<IUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ['admin', 'user'],
-      default: 'user',
-      required: true,
+      enum: Object.values(USER_ROLE),
+      default: USER_ROLE.USER,
+    },
+    status: {
+      type: String,
+      enum: Object.values(USER_STATUS),
+      default: USER_STATUS.ACTIVE,
     },
     image: {
       type: String,
@@ -30,6 +36,13 @@ const userSchema = new Schema<IUser, UserModel>(
     gender: {
       type: String,
       enum: ['male', 'female'],
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    passwordChangedAt: {
+      type: Date,
     },
     notifications: {
       pushNotification: {
@@ -47,12 +60,35 @@ const userSchema = new Schema<IUser, UserModel>(
   },
 );
 
-// --- Middlewares ---
-// Filter out deleted users by default
-userSchema.pre('find', function (next) {
-  this.find({ isDeleted: { $ne: true } });
+userSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  if (!user.isModified('password')) return next();
+
+  user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds));
   next();
 });
 
-// --- Export Model ---
-export const User = model<IUser, UserModel>('User', userSchema);
+// Set password to empty string after saving
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
+
+userSchema.statics.isUserExistsByEmail = async function (email: string) {
+  return await this.findOne({ email }).select('+password');
+};
+
+userSchema.statics.isPasswordMatched = async function (plainTextPassword, hashedPassword) {
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
+  passwordChangedTimestamp: number,
+  jwtIssuedTimestamp: number,
+) {
+  const passwordChangedTime = new Date(passwordChangedTimestamp).getTime() / 1000;
+  return passwordChangedTime > jwtIssuedTimestamp;
+};
+
+export const User = model<TUser, IUserModel>('User', userSchema);

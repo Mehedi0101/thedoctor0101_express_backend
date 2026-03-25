@@ -1,35 +1,18 @@
 import { z } from 'zod';
 
-// --- Forget Password Schema ---
-const forgetPasswordZodSchema = z.object({
+// --- Register Validation Schema ---
+const registerValidationSchema = z.object({
   body: z.object({
-    email: z
-      .string({ required_error: 'Email is required' })
-      .email('Invalid email address'),
-  }),
-});
-
-// --- Verify OTP Schema ---
-const verifyOtpZodSchema = z.object({
-  body: z.object({
+    name: z.string({ required_error: 'Name is required' }),
     email: z.string({ required_error: 'Email is required' }).email(),
-    otp: z.string({ required_error: 'OTP is required' }),
-  }),
-});
-
-// --- Reset Password Schema ---
-const resetPasswordZodSchema = z.object({
-  body: z.object({
-    email: z.string({ required_error: 'Email is required' }).email(),
-    resetToken: z.string({ required_error: 'Reset token is required' }),
-    newPassword: z
-      .string({ required_error: 'New password is required' })
+    password: z
+      .string({ required_error: 'Password is required' })
       .min(6, 'Password must be at least 6 characters'),
+    image: z.string().optional(),
+    gender: z.enum(['male', 'female']).optional(),
   }),
 });
 
 export const AuthValidation = {
-  forgetPasswordZodSchema,
-  verifyOtpZodSchema,
-  resetPasswordZodSchema,
+  registerValidationSchema,
 };

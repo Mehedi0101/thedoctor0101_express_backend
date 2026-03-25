@@ -1,5 +1,4 @@
-// --- Tour Interface ---
-export type ITour = {
+export type TTour = {
   title: string;
   description: string;
   location: string;

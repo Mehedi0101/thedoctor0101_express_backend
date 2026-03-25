@@ -1,9 +1,8 @@
 import { Types } from 'mongoose';
 
-// --- Blog Interface ---
-export type IBlog = {
+export type TBlog = {
   title: string;
-  description: string; // Rich text content (HTML/Markdown)
+  description: string;
   likes: Types.ObjectId[];
   image: string;
   isDeleted: boolean;

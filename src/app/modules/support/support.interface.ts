@@ -1,9 +1,9 @@
 import { Types } from 'mongoose';
 
-// --- Support Interface ---
-export type ISupport = {
+export type TSupport = {
   userId: Types.ObjectId;
   title: string;
   email: string;
   message: string;
+  isDeleted: boolean;
 };

@@ -1,14 +1,17 @@
 import express from 'express';
-import validateRequest from '../../middlewares/validateRequest';
-import { UserValidation } from '../user/user.validation';
-import { AuthController } from './auth.controller';
+import validateRequest, { validateRequestCookies } from '../../middlewares/validateRequest';
+import { AuthControllers } from './auth.controller';
+import { AuthValidation } from './auth.validation';
+
+// --- Auth Routes ---
 
 const router = express.Router();
 
+// User registration
 router.post(
   '/register',
-  validateRequest(UserValidation.createUserZodSchema),
-  AuthController.registerUser,
+  validateRequest(AuthValidation.registerValidationSchema),
+  AuthControllers.registerUser,
 );
 
 export const AuthRoutes = router;

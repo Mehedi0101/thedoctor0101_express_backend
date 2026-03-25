@@ -1,22 +1,44 @@
 import { Schema, model } from 'mongoose';
-import { ISupport } from './support.interface';
+import { TSupport } from './support.interface';
 
-// --- Schema Definition ---
-const supportSchema = new Schema<ISupport>(
+const supportSchema = new Schema<TSupport>(
   {
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    title: { type: String, required: true },
-    email: { type: String, required: true },
-    message: { type: String, required: true },
+    title: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   },
 );
 
-// --- Export Model ---
-export const Support = model<ISupport>('Support', supportSchema);
+// Filter out deleted support tickets
+supportSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+supportSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+export const Support = model<TSupport>('Support', supportSchema);

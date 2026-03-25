@@ -1,8 +1,8 @@
 import { Types } from 'mongoose';
 
-// --- Notification Interface ---
-export type INotification = {
+export type TNotification = {
   title: string;
   message: string;
-  viewedBy: Types.ObjectId[]; // List of users who have seen the notification
+  viewedBy: Types.ObjectId[];
+  isDeleted: boolean;
 };

@@ -1,8 +1,14 @@
+export type TRegisterUser = {
+  name: string;
+  email: string;
+  password: string;
+};
+
 // --- Password Reset Interface ---
 export type IPasswordReset = {
   email: string;
-  otp: string; // Hashed OTP
-  resetToken?: string; // Issued after OTP verification
-  isVerified: boolean; // True if OTP is verified
+  otp: string;
+  resetToken?: string;
+  isVerified: boolean;
   expiresAt: Date;
 };

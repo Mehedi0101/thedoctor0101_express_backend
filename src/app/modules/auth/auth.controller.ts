@@ -1,24 +1,25 @@
-import httpStatus from 'http-status';
-import catchAsync from '../../utils/catchAsync';
-import sendResponse from '../../utils/sendResponse';
-import { AuthService } from './auth.service';
+import httpStatus from "http-status";
+import sendResponse from "../../utils/sendResponse";
+import { AuthServices } from "./auth.service";
+import catchAsync from "../../utils/catchAsync";
 
+/**
+ * Registers a new user and issues tokens.
+ */
 const registerUser = catchAsync(async (req, res) => {
-  const result = await AuthService.registerUser(req.body);
+  const result = await AuthServices.registerUser(req.body);
+  const { accessToken } = result;
 
   sendResponse(res, {
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     success: true,
-    message: 'User registered successfully',
+    message: "User registered successfully!",
     data: {
-      _id: result._id,
-      name: result.name,
-      email: result.email,
-      role: result.role,
+      accessToken,
     },
   });
 });
 
-export const AuthController = {
+export const AuthControllers = {
   registerUser,
 };

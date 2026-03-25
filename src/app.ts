@@ -1,44 +1,58 @@
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
-import helmet from 'helmet';
+import httpStatus from 'http-status';
 import cookieParser from 'cookie-parser';
-import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
 import router from './app/routes';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
 
 const app: Application = express();
 
-// Security Middlewares
-app.use(helmet());
-app.use(cors());
-
-// Parsers
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// --- Middlewares & Routes ---
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174', '*'],
+    credentials: true,
+    methods: 'GET,POST,PUT,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
+  }),
+);
 app.use(cookieParser());
 
-// Root Route
-app.get('/', (req: Request, res: Response) => {
-  res.send('TheDoctor0101 Backend Server is Running! 🚀');
-});
+// --- Parsers ---
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Application Routes
+// --- API Routes ---
 app.use('/api/v1', router);
 
-// Global Error Handler
-app.use(globalErrorHandler);
-
-// Handle Not Found Routes
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    success: false,
-    message: 'Not Found',
-    errorMessages: [
-      {
-        path: req.originalUrl,
-        message: 'API Not Found',
+/**
+ * Health check / Home route
+ */
+app.get('/', (req: Request, res: Response) => {
+  res.status(httpStatus.OK).json({
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Welcome to TheDoctor0101 API',
+    data: {
+      service: 'TheDoctor0101 Backend API',
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString(),
+      endpoints: {
+        health: '/health',
+        api: '/api/v1',
       },
-    ],
+    },
   });
 });
+
+// --- Error Handling ---
+
+// Global error handler
+app.use(globalErrorHandler);
+
+// Handle not found
+app.use(notFound);
 
 export default app;

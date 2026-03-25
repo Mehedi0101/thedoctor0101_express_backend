@@ -1,5 +1,4 @@
-// --- Transport Interface ---
-export type ITransport = {
+export type TTransport = {
   title: string;
   duration: string;
   capacity: number;

@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
-import { IReview } from './review.interface';
+import { SERVICE_TYPE } from './review.constant';
+import { TReview } from './review.interface';
 
-// --- Schema Definition ---
-const reviewSchema = new Schema<IReview>(
+const reviewSchema = new Schema<TReview>(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -11,13 +11,13 @@ const reviewSchema = new Schema<IReview>(
     },
     serviceType: {
       type: String,
+      enum: Object.values(SERVICE_TYPE),
       required: true,
-      enum: ['Tour', 'Transport'],
     },
     serviceId: {
       type: Schema.Types.ObjectId,
+      refPath: 'serviceType',
       required: true,
-      refPath: 'serviceType', // Polymorphic reference
     },
     rating: {
       type: Number,
@@ -29,11 +29,25 @@ const reviewSchema = new Schema<IReview>(
       type: String,
       required: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   },
 );
 
-// --- Export Model ---
-export const Review = model<IReview>('Review', reviewSchema);
+// Filter out deleted reviews
+reviewSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+reviewSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+export const Review = model<TReview>('Review', reviewSchema);

@@ -1,7 +1,6 @@
 import { Types } from 'mongoose';
 
-// --- Booking Interface ---
-export type IBooking = {
+export type TBooking = {
   userId: Types.ObjectId;
   tourId?: Types.ObjectId;
   transportId?: Types.ObjectId;
@@ -15,7 +14,7 @@ export type IBooking = {
   };
   totalPassengers: number;
   flightDetails?: {
-    arrivalDate: string; // ISO string for simplicity in interface
+    arrivalDate: string;
     arrivalFlightNumber: string;
   };
   passengerDetails: {
