@@ -4,6 +4,11 @@ export type TRegisterUser = {
   password: string;
 };
 
+export type TLoginUser = {
+  email: string;
+  password: string;
+};
+
 // --- Password Reset Interface ---
 export type IPasswordReset = {
   email: string;
