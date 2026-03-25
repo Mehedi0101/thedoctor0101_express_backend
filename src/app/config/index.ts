@@ -15,4 +15,5 @@ export default {
   email_user: process.env.EMAIL_USER,
   email_pass: process.env.EMAIL_PASS,
   email_from: process.env.EMAIL_FROM,
+  cors_origin: process.env.CORS_ORIGIN,
 };

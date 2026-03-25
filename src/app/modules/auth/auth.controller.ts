@@ -4,7 +4,8 @@ import { AuthServices } from "./auth.service";
 import catchAsync from "../../utils/catchAsync";
 
 /**
- * Registers a new user and issues tokens.
+ * @function registerUser
+ * @description Registers a new user, creates their account, and issues access tokens.
  */
 const registerUser = catchAsync(async (req, res) => {
   const result = await AuthServices.registerUser(req.body);
@@ -25,6 +26,10 @@ const registerUser = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * @function loginUser
+ * @description Authenticates a user using email and password, and issues access tokens upon successful login.
+ */
 const loginUser = catchAsync(async (req, res) => {
   const result = await AuthServices.loginUser(req.body);
   const { accessToken, user } = result;
@@ -44,6 +49,10 @@ const loginUser = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * @function forgotPassword
+ * @description Initiates the password recovery process by generating and sending a 6-digit OTP to the user's email.
+ */
 const forgotPassword = catchAsync(async (req, res) => {
   const { email } = req.body;
   await AuthServices.forgotPassword(email);
@@ -56,6 +65,10 @@ const forgotPassword = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * @function verifyOtp
+ * @description Verifies the provided OTP against the database and issues a temporary reset token if valid.
+ */
 const verifyOtp = catchAsync(async (req, res) => {
   const result = await AuthServices.verifyOtp(req.body);
 
@@ -67,6 +80,10 @@ const verifyOtp = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * @function resetPassword
+ * @description Resets the user's securely hashed password using a valid reset token.
+ */
 const resetPassword = catchAsync(async (req, res) => {
   await AuthServices.resetPassword(req.body);
 

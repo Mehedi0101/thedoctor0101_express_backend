@@ -15,7 +15,10 @@ import { TLoginUser, TRegisterUser } from './auth.interface';
 import { PasswordReset } from './auth.model';
 
 /**
- * Registers a new user.
+ * @function registerUser
+ * @description Registers a new user in the database and generates an initial access token.
+ * @param {TRegisterUser} payload - The user registration details (name, email, password).
+ * @returns {Promise<{ accessToken: string, newUser: any }>} The generated token and user record.
  */
 const registerUser = async (payload: TRegisterUser) => {
   const user = await User.isUserExistsByEmail(payload?.email);
@@ -51,7 +54,10 @@ const registerUser = async (payload: TRegisterUser) => {
 };
 
 /**
- * Logs in a user.
+ * @function loginUser
+ * @description Authenticates a user by verifying their email and password.
+ * @param {TLoginUser} payload - The user login credentials (email, password).
+ * @returns {Promise<{ accessToken: string, user: any }>} The generated token and user record.
  */
 const loginUser = async (payload: TLoginUser) => {
   const user = await User.isUserExistsByEmail(payload?.email);
@@ -93,7 +99,10 @@ const loginUser = async (payload: TLoginUser) => {
 };
 
 /**
- * Forgot password logic: generates OTP, hashes it, and saves it to the database.
+ * @function forgotPassword
+ * @description Generates a 6-digit OTP, securely hashes it, saves it to the DB with a 5-minute expiry, and emails the user.
+ * @param {string} email - The email address of the user requesting a password reset.
+ * @returns {Promise<null>}
  */
 const forgotPassword = async (email: string) => {
   const user = await User.isUserExistsByEmail(email);
@@ -139,7 +148,10 @@ const forgotPassword = async (email: string) => {
 };
 
 /**
- * Verifies the OTP and generates a reset token.
+ * @function verifyOtp
+ * @description Verifies a submitted OTP against the hashed version in the DB, and generates a one-time reset token if valid.
+ * @param {Object} payload - Contains the user's email and the 6-digit OTP.
+ * @returns {Promise<{ resetToken: string }>} A secure reset token valid for 10 minutes.
  */
 const verifyOtp = async (payload: { email: string; otp: string }) => {
   const { email, otp } = payload;
@@ -179,7 +191,10 @@ const verifyOtp = async (payload: { email: string; otp: string }) => {
 };
 
 /**
- * Resets the user's password using the reset token.
+ * @function resetPassword
+ * @description Resets a user's password using a valid reset token, hashes the new password, and sends a confirmation email.
+ * @param {Object} payload - Contains the resetToken and the newPassword.
+ * @returns {Promise<null>}
  */
 const resetPassword = async (payload: { resetToken: string; newPassword: string }) => {
   const { resetToken, newPassword } = payload;

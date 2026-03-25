@@ -22,23 +22,12 @@ const auth = (...requiredRoles: (keyof typeof USER_ROLE)[]) => {
 
     const decoded = verifyToken(token, config.jwt_access_secret as string) as JwtPayload;
 
-    const { role, email, iat } = decoded;
+    const { role, email } = decoded;
 
     const user = await User.isUserExistsByEmail(email);
 
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
-    }
-
-    if (user?.status === 'blocked') {
-      throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked !');
-    }
-
-    if (
-      user.passwordChangedAt &&
-      User.isJWTIssuedBeforePasswordChanged(new Date(user.passwordChangedAt).getTime(), iat as number)
-    ) {
-      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !');
     }
 
     if (requiredRoles.length && !requiredRoles.includes(role.toUpperCase() as keyof typeof USER_ROLE)) {

@@ -5,13 +5,16 @@ import cookieParser from 'cookie-parser';
 import notFound from './app/middlewares/notFound';
 import router from './app/routes';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import config from './app/config';
 
 const app: Application = express();
 
 // --- Middlewares & Routes ---
+const corsOrigins = config.cors_origin ? config.cors_origin.split(',') : ['*'];
+
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174', '*'],
+    origin: corsOrigins,
     credentials: true,
     methods: 'GET,POST,PUT,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Authorization',
@@ -33,9 +36,9 @@ app.get('/', (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Welcome to TheDoctor0101 API',
+    message: 'Welcome to PuntaGo API',
     data: {
-      service: 'TheDoctor0101 Backend API',
+      service: 'PuntaGo Backend API',
       version: '1.0.0',
       environment: process.env.NODE_ENV || 'development',
       timestamp: new Date().toISOString(),
