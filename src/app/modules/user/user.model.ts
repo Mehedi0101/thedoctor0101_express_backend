@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import config from '../../config';
-import { USER_ROLE, USER_STATUS } from './user.constant';
+import { USER_ROLE } from './user.constant';
 import { IUserModel, TUser } from './user.interface';
 
 const userSchema = new Schema<TUser, IUserModel>(
@@ -25,11 +25,6 @@ const userSchema = new Schema<TUser, IUserModel>(
       enum: Object.values(USER_ROLE),
       default: USER_ROLE.USER,
     },
-    status: {
-      type: String,
-      enum: Object.values(USER_STATUS),
-      default: USER_STATUS.ACTIVE,
-    },
     image: {
       type: String,
     },
@@ -37,14 +32,7 @@ const userSchema = new Schema<TUser, IUserModel>(
       type: String,
       enum: ['male', 'female'],
     },
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
-    passwordChangedAt: {
-      type: Date,
-    },
-    notifications: {
+    notificationSettings: {
       pushNotification: {
         type: Boolean,
         default: false,
@@ -81,14 +69,6 @@ userSchema.statics.isUserExistsByEmail = async function (email: string) {
 
 userSchema.statics.isPasswordMatched = async function (plainTextPassword, hashedPassword) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
-};
-
-userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
-  passwordChangedTimestamp: number,
-  jwtIssuedTimestamp: number,
-) {
-  const passwordChangedTime = new Date(passwordChangedTimestamp).getTime() / 1000;
-  return passwordChangedTime > jwtIssuedTimestamp;
 };
 
 export const User = model<TUser, IUserModel>('User', userSchema);

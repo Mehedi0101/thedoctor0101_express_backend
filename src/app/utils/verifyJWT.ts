@@ -1,6 +1,6 @@
 import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
 import AppError from '../errors/AppError';
-import { USER_ROLE, USER_STATUS } from '../modules/user/user.constant';
+import { USER_ROLE } from '../modules/user/user.constant';
 
 export const createToken = (
   jwtPayload: {
@@ -8,7 +8,6 @@ export const createToken = (
     name: string;
     email: string;
     role: (typeof USER_ROLE)[keyof typeof USER_ROLE];
-    status: (typeof USER_STATUS)[keyof typeof USER_STATUS];
   },
   secret: string,
   expiresIn: string,
