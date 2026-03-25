@@ -56,8 +56,20 @@ const forgotPassword = catchAsync(async (req, res) => {
   });
 });
 
+const verifyOtp = catchAsync(async (req, res) => {
+  const result = await AuthServices.verifyOtp(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'OTP verified successfully!',
+    data: result,
+  });
+});
+
 export const AuthControllers = {
   registerUser,
   loginUser,
   forgotPassword,
+  verifyOtp,
 };

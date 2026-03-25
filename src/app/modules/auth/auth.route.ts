@@ -28,4 +28,11 @@ router.post(
   AuthControllers.forgotPassword,
 );
 
+// Verify OTP
+router.post(
+  '/verify-otp',
+  validateRequest(AuthValidation.verifyOtpValidationSchema),
+  AuthControllers.verifyOtp,
+);
+
 export const AuthRoutes = router;

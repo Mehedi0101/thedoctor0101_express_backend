@@ -66,6 +66,10 @@ userSchema.statics.isUserExistsByEmail = async function (email: string) {
   return await this.findOne({ email }).select('+password');
 };
 
+userSchema.statics.isUserExistsById = async function (id: string) {
+  return await this.findById(id).select('-password');
+};
+
 userSchema.statics.isPasswordMatched = async function (plainTextPassword, hashedPassword) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };

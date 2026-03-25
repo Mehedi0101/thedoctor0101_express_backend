@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import httpStatus from 'http-status';
 import config from '../../config';
 import AppError from '../../errors/AppError';
@@ -137,8 +138,48 @@ const forgotPassword = async (email: string) => {
   return null;
 };
 
+/**
+ * Verifies the OTP and generates a reset token.
+ */
+const verifyOtp = async (payload: { email: string; otp: string }) => {
+  const { email, otp } = payload;
+  const user = await User.isUserExistsByEmail(email);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  // Find the OTP document
+  const resetDocument = await PasswordReset.findOne({ email });
+
+  if (!resetDocument) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No active OTP found for this email!');
+  }
+
+  if (resetDocument.expiresAt < new Date()) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'OTP has expired!');
+  }
+
+  const isOtpValid = await bcrypt.compare(otp, resetDocument.otp);
+
+  if (!isOtpValid) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid OTP!');
+  }
+
+  // Generate a random reset token
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  // Mark as verified and save the reset token
+  resetDocument.isVerified = true;
+  resetDocument.resetToken = resetToken;
+  await resetDocument.save();
+
+  return { resetToken };
+};
+
 export const AuthServices = {
   registerUser,
   loginUser,
   forgotPassword,
+  verifyOtp,
 };

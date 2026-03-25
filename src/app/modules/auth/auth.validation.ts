@@ -26,8 +26,17 @@ const forgotPasswordValidationSchema = z.object({
   }),
 });
 
+// --- Verify OTP Validation Schema ---
+const verifyOtpValidationSchema = z.object({
+  body: z.object({
+    email: z.string({ required_error: 'Email is required' }).email(),
+    otp: z.string({ required_error: 'OTP is required' }).length(6, 'OTP must be 6 digits'),
+  }),
+});
+
 export const AuthValidation = {
   registerValidationSchema,
   loginValidationSchema,
   forgotPasswordValidationSchema,
+  verifyOtpValidationSchema,
 };

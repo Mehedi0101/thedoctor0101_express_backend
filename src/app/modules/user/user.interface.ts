@@ -15,8 +15,7 @@ export type TUser = {
 };
 
 export interface IUserModel extends Model<TUser> {
-  // eslint-disable-next-line no-unused-vars
   isUserExistsByEmail(email: string): Promise<TUser | null>;
-  // eslint-disable-next-line no-unused-vars
+  isUserExistsById(id: string): Promise<TUser | null>;
   isPasswordMatched(plainTextPassword: string, hashedPassword: string): Promise<boolean>;
 }
