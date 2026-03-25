@@ -17,3 +17,17 @@ export type IPasswordReset = {
   isVerified: boolean;
   expiresAt: Date;
 };
+
+export type TOtpEmailTemplateParams = {
+  title?: string;
+  otp: string;
+  expiresMinutes?: number;
+  footer?: string;
+  name?: string;
+};
+
+export type TPasswordChangedTemplateParams = {
+  name?: string;
+  footer?: string;
+};
+

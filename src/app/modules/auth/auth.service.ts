@@ -1,10 +1,17 @@
+import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import config from '../../config';
 import AppError from '../../errors/AppError';
+import { generateOTP } from '../../utils/authHelper';
+import { getOTPExpiryDate } from '../../utils/dateHelper';
+import { emailHelper } from '../../utils/emailHelper';
 import { createToken } from '../../utils/verifyJWT';
+import { otpEmailTemplate } from '../../../views/email.views';
+
 import { USER_ROLE } from '../user/user.constant';
 import { User } from '../user/user.model';
 import { TLoginUser, TRegisterUser } from './auth.interface';
+import { PasswordReset } from './auth.model';
 
 /**
  * Registers a new user.
@@ -84,7 +91,54 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
+/**
+ * Forgot password logic: generates OTP, hashes it, and saves it to the database.
+ */
+const forgotPassword = async (email: string) => {
+  const user = await User.isUserExistsByEmail(email);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  // Generate a random 6-digit OTP
+  const otp = generateOTP();
+
+  // Hash the OTP before saving to database
+  const hashedOtp = await bcrypt.hash(otp, Number(config.bcrypt_salt_rounds));
+
+  // Set expiration time (e.g., 5 minutes from now)
+  const expiresAt = getOTPExpiryDate(5);
+
+  // Save or update the OTP in the PasswordReset collection
+  await PasswordReset.findOneAndUpdate(
+    { email },
+    {
+      email,
+      otp: hashedOtp,
+      expiresAt,
+      isVerified: false,
+    },
+    { upsert: true, new: true },
+  );
+
+  const emailHtmlContent = otpEmailTemplate({
+    otp,
+    name: user.name,
+    expiresMinutes: 5,
+  });
+
+  await emailHelper({
+    to: user.email,
+    subject: 'Your Password Reset OTP',
+    html: emailHtmlContent,
+  });
+
+  return null;
+};
+
 export const AuthServices = {
   registerUser,
   loginUser,
+  forgotPassword,
 };

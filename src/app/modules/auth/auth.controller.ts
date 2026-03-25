@@ -44,7 +44,20 @@ const loginUser = catchAsync(async (req, res) => {
   });
 });
 
+const forgotPassword = catchAsync(async (req, res) => {
+  const { email } = req.body;
+  await AuthServices.forgotPassword(email);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'If email exists in our system, an OTP has been sent.',
+    data: null,
+  });
+});
+
 export const AuthControllers = {
   registerUser,
   loginUser,
+  forgotPassword,
 };

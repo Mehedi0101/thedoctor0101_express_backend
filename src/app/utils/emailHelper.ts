@@ -15,12 +15,12 @@ export const emailHelper = async ({ to, subject, message, html, next }: TEmailHe
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: config.email_user,
+        pass: config.email_pass,
       },
     });
     const mailOptions = {
-      from: `"TheDoctor0101" <${process.env.EMAIL_FROM}>`,
+      from: `"PuntaGo" <${config.email_from}>`,
       to,
       subject,
       text: message || '',
