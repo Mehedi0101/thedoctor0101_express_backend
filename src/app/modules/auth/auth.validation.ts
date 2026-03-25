@@ -34,9 +34,18 @@ const verifyOtpValidationSchema = z.object({
   }),
 });
 
+// --- Reset Password Validation Schema ---
+const resetPasswordValidationSchema = z.object({
+  body: z.object({
+    resetToken: z.string({ required_error: 'Reset token is required' }),
+    newPassword: z.string({ required_error: 'New password is required' }).min(6, 'Password must be at least 6 characters'),
+  }),
+});
+
 export const AuthValidation = {
   registerValidationSchema,
   loginValidationSchema,
   forgotPasswordValidationSchema,
   verifyOtpValidationSchema,
+  resetPasswordValidationSchema,
 };

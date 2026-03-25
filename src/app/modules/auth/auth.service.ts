@@ -7,7 +7,7 @@ import { generateOTP } from '../../utils/authHelper';
 import { getOTPExpiryDate } from '../../utils/dateHelper';
 import { emailHelper } from '../../utils/emailHelper';
 import { createToken } from '../../utils/verifyJWT';
-import { otpEmailTemplate } from '../../../views/email.views';
+import { otpEmailTemplate, passwordChangedTemplate } from '../../../views/email.views';
 
 import { USER_ROLE } from '../user/user.constant';
 import { User } from '../user/user.model';
@@ -169,12 +169,59 @@ const verifyOtp = async (payload: { email: string; otp: string }) => {
   // Generate a random reset token
   const resetToken = crypto.randomBytes(32).toString('hex');
 
-  // Mark as verified and save the reset token
+  // Mark as verified, save the reset token, and extend expiresAt by 10 minutes
   resetDocument.isVerified = true;
   resetDocument.resetToken = resetToken;
+  resetDocument.expiresAt = getOTPExpiryDate(10);
   await resetDocument.save();
 
   return { resetToken };
+};
+
+/**
+ * Resets the user's password using the reset token.
+ */
+const resetPassword = async (payload: { resetToken: string; newPassword: string }) => {
+  const { resetToken, newPassword } = payload;
+
+  const resetDocument = await PasswordReset.findOne({
+    resetToken,
+    isVerified: true,
+  });
+
+  if (!resetDocument) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid or expired reset token!');
+  }
+
+  if (resetDocument.expiresAt < new Date()) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Reset token has expired!');
+  }
+
+  const user = await User.findOne({ email: resetDocument.email });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  // Update password (Mongoose pre-save hook will hash it)
+  user.password = newPassword;
+  await user.save();
+
+  // Delete the reset document so it can't be used again
+  await PasswordReset.deleteOne({ _id: resetDocument._id });
+
+  // Send success email
+  const emailHtmlContent = passwordChangedTemplate({
+    name: user.name,
+  });
+
+  await emailHelper({
+    to: user.email,
+    subject: 'Password Changed Successfully',
+    html: emailHtmlContent,
+  });
+
+  return null;
 };
 
 export const AuthServices = {
@@ -182,4 +229,5 @@ export const AuthServices = {
   loginUser,
   forgotPassword,
   verifyOtp,
+  resetPassword,
 };
